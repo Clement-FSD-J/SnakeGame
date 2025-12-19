@@ -15,9 +15,9 @@ h2{
 }
 
 #gameBoard{
-    border: 3px solid;
+    border: 3px solid red;
 }
 
-#score{
+#score,#highScore{
     margin-top: 1em;
 }

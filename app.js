@@ -1,6 +1,7 @@
 const gameBoard = document.getElementById('gameBoard');
 const context = gameBoard.getContext('2d');
 const scoreText = document.getElementById('scoreVal');
+const highScore = document.getElementById('highScore');
 
 const WIDTH = gameBoard.width;
 const HEIGHT = gameBoard.height;
@@ -22,6 +23,7 @@ let snake = [
 ];
 
 window.addEventListener('keydown',keyPress);
+document.addEventListener('keydown',pauseResume);
 
 startGame();
 
@@ -42,7 +44,6 @@ function clearBoard(){
 function createFood(){
     foodX = Math.floor(Math.random()*WIDTH/UNIT)*UNIT;
     foodY = Math.floor(Math.random()*HEIGHT/UNIT)*UNIT;
-
 }
 
 function displayFood(){
@@ -51,9 +52,12 @@ function displayFood(){
 }
 
 function drawSnake(){
-    context.fillStyle = 'aqua';
     context.strokeStyle = '#212121';
-    snake.forEach(snakePart => {
+    snake.forEach((snakePart,index) => {
+        if(index == 0)
+            context.fillStyle = 'yellow';
+        else 
+            context.fillStyle = 'aqua';
         context.fillRect(snakePart.x,snakePart.y,UNIT,UNIT);
         context.strokeRect(snakePart.x,snakePart.y,UNIT,UNIT);
     });
@@ -72,7 +76,7 @@ function moveSnake(){
 }
 
 function nextTick(){
-    if(active){
+    if(active && started){
         setTimeout(() => {
             clearBoard(),
             displayFood();
@@ -81,7 +85,7 @@ function nextTick(){
             checkGameOver();
             nextTick();
         }, 200);
-    }else{
+    }else if(!active){
         clearBoard();
         context.font = "bold 50px serif"
         context.fillStyle = "white";
@@ -91,10 +95,13 @@ function nextTick(){
 }
 
 function keyPress(event){
-    if(!started){
+    if(!started && event.code !== "Space"){
         started = true;
         nextTick();
     }
+
+    if(!started) return; // lock movement when paused
+
     const LEFT = 37
     const UP = 38
     const RIGHT = 39
@@ -132,5 +139,18 @@ function checkGameOver(){
         case(snake[0].y>=HEIGHT):
             active=false;
             break;
+    }
+}
+
+function pauseResume(event){
+    if(event.code == "Space"){
+        event.preventDefault();
+        
+        if(!started){
+            started = true;
+            nextTick();
+        }else{
+            started = false;
+        }
     }
 }
